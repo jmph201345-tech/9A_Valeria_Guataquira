@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menú - Reino Mágico</title>
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <div class="luna"></div>
+    <div class="estrellas" id="estrellas"></div>
+
+    <div class="tarjeta tarjeta-ancha">
+        <div class="ornamento">✦ ❖ ✦</div>
+        <h1 class="titulo">Reino Mágico</h1>
+        <p class="subtitulo">Elige tu destino, <span class="saludo" id="nombre-usuario"></span></p>
+
+        <div class="opciones">
+            <a class="opcion" href="index.html">
+                <span class="imagen">🦋</span>
+                <span>Portafolio</span>
+            </a>
+            <a class="opcion" href="juego.html">
+                <span class="imagen">🐉</span>
+                <span>Geometry Dash</span>
+            </a>
+            <a class="opcion" href="guitarhero.html">
+                <span class="imagen">🎸</span>
+                <span>Guitar Hero</span>
+            </a>
+            <a class="opcion" href="diario.html">
+                <span class="imagen">📔</span>
+                <span>Diario Secreto</span>
+            </a>
+            <a class="opcion" href="tareas.html">
+                <span class="imagen">🧙</span>
+                <span>Tareas</span>
+            </a>
+        </div>
+
+        <div class="barra-acciones">
+            <button type="button" class="boton boton-secundario" onclick="cerrarSesion()">Cerrar sesión</button>
+        </div>
+    </div>
+
+    <script src="magia.js"></script>
+    <script>
+        verificarSesion();
+        var usuario = usuarioActual();
+        document.getElementById('nombre-usuario').textContent = usuario ? 'viajero ' + usuario : '';
+    </script>
+</body>
+</html>
