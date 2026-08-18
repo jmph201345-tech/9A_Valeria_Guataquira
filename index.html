@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portafolio - Valeria Guataquira</title>
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <div class="luna"></div>
+    <div class="estrellas" id="estrellas"></div>
+
+    <div class="tarjeta tarjeta-ancha">
+        <div class="ornamento">✦ ❖ ✦</div>
+        <h1 class="titulo">Portafolio</h1>
+        <p class="subtitulo">El rincón mágico de Valeria</p>
+
+        <div class="presentacion">
+            <div class="marco-imagen">
+                <img src="imagen.png" alt="Valeria">
+            </div>
+            <div class="contenido-presentacion">
+                <h2 class="nombre">Valeria Guataquira</h2>
+                <p class="parrafo">Hola, soy Valeria, estudiante del Liceo Santa Bernardita (LSB). Tengo 14 años, me gusta la música, me gusta el arte y mi color favorito es el rojo.</p>
+
+                <div class="barra-acciones">
+                    <button type="button" class="boton" id="btn-toggle">Mostrar horario</button>
+                    <button type="button" class="boton boton-secundario" id="btn-color">Modo dragón</button>
+                    <button type="button" class="boton boton-secundario" onclick="window.location.href='menu.html'">Volver al menú</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabla-caja" id="horario" style="display:none;">
+            <h2>Horario de clases</h2>
+            <div style="overflow-x:auto;">
+                <table class="tabla" id="tabla-clases">
+                    <tr>
+                        <th>Día 1</th>
+                        <th>Día 2</th>
+                        <th>Día 3</th>
+                        <th>Día 4</th>
+                        <th>Día 5</th>
+                        <th>Día 6</th>
+                        <th>Día 7</th>
+                    </tr>
+                    <tr>
+                        <td>Biología</td>
+                        <td>Edu. Física</td>
+                        <td>Español</td>
+                        <td>Francés</td>
+                        <td>Biología</td>
+                        <td>Edu. Física</td>
+                        <td>Inglés</td>
+                    </tr>
+                    <tr>
+                        <td>Geometría</td>
+                        <td>Sociales</td>
+                        <td>Sociales</td>
+                        <td>Español</td>
+                        <td>Math</td>
+                        <td>Inglés (MEL)</td>
+                        <td>Sociales</td>
+                    </tr>
+                    <tr>
+                        <td>Descanso</td>
+                        <td>Descanso</td>
+                        <td>Descanso</td>
+                        <td>Descanso</td>
+                        <td>Descanso</td>
+                        <td>Descanso</td>
+                        <td>Descanso</td>
+                    </tr>
+                    <tr>
+                        <td>Español</td>
+                        <td>Francés</td>
+                        <td>Math</td>
+                        <td>Tech</td>
+                        <td>Inglés</td>
+                        <td>Francés</td>
+                        <td>Robótica</td>
+                    </tr>
+                    <tr>
+                        <td>Sociales</td>
+                        <td>Math</td>
+                        <td>Física</td>
+                        <td>Inglés</td>
+                        <td>Sociales</td>
+                        <td>Math</td>
+                        <td>Química</td>
+                    </tr>
+                    <tr>
+                        <td>Francés</td>
+                        <td>Skills</td>
+                        <td>Danzas</td>
+                        <td>Ética</td>
+                        <td>Dibujo</td>
+                        <td>Sociales</td>
+                        <td>Biología</td>
+                    </tr>
+                    <tr>
+                        <td>Break</td>
+                        <td>Break</td>
+                        <td>Break</td>
+                        <td>Break</td>
+                        <td>Break</td>
+                        <td>Break</td>
+                        <td>Break</td>
+                    </tr>
+                    <tr>
+                        <td>Cátedra de la Paz</td>
+                        <td>Español</td>
+                        <td>PILEO</td>
+                        <td>Biología</td>
+                        <td>Skills</td>
+                        <td>PILEO</td>
+                        <td>Español</td>
+                    </tr>
+                    <tr>
+                        <td>Inglés</td>
+                        <td>Inglés</td>
+                        <td>Biología</td>
+                        <td>Math</td>
+                        <td>Danzas</td>
+                        <td>Informática</td>
+                        <td>Math</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="magia.js"></script>
+    <script>
+        verificarSesion();
+
+        var horario = document.getElementById('horario');
+        var btn = document.getElementById('btn-toggle');
+
+        btn.addEventListener('click', function () {
+            var visible = horario.style.display !== 'none';
+            horario.style.display = visible ? 'none' : 'block';
+            btn.textContent = visible ? 'Mostrar horario' : 'Ocultar horario';
+        });
+
+        var botonColor = document.getElementById('btn-color');
+        var miTabla = document.getElementById('tabla-clases');
+
+        botonColor.addEventListener('click', function () {
+            miTabla.classList.toggle('modo-hacker');
+        });
+    </script>
+</body>
+</html>
