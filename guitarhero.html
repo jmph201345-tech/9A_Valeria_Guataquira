@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guitar Hero - Valeria Guataquira</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: linear-gradient(135deg, #8b1500, #b71c1c);
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.contenedor {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 30px 40px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    width: 92%;
+    max-width: 760px;
+}
+
+.titulo {
+    color: #fff;
+    font-size: 36px;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.pantalla-menu .subtitulo {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.rejilla-niveles {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.btn-nivel {
+    padding: 12px 0;
+    background: transparent;
+    color: #fff;
+    border: 2px solid #f0c75e;
+    border-radius: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 0 8px rgba(255, 123, 0, 0.4);
+}
+
+.btn-nivel:hover:not(:disabled) {
+    background: #f0c75e;
+    color: #000;
+    box-shadow: 0 0 20px rgba(255, 123, 0, 0.7);
+}
+
+.btn-nivel:disabled {
+    border-color: rgba(255, 255, 255, 0.25);
+    color: rgba(255, 255, 255, 0.35);
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+.btn-nivel.completado {
+    border-color: #39ff14;
+    color: #39ff14;
+    box-shadow: 0 0 8px rgba(57, 255, 20, 0.4);
+}
+
+button {
+    padding: 12px 20px;
+    background: transparent;
+    color: #fff;
+    border: 2px solid #f0c75e;
+    border-radius: 50px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 0 8px rgba(255, 123, 0, 0.4);
+    margin-top: 10px;
+}
+
+button:hover {
+    background: #f0c75e;
+    color: #000;
+    box-shadow: 0 0 20px rgba(255, 123, 0, 0.7);
+}
+
+.pantalla-juego { display: none; }
+
+.info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    font-size: 16px;
+    margin-bottom: 10px;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.info span {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #f0c75e;
+    border-radius: 50px;
+    padding: 5px 14px;
+    box-shadow: 0 0 8px rgba(255, 123, 0, 0.4);
+}
+
+.barra-energia {
+    width: 200px;
+    height: 16px;
+    border: 2px solid #f0c75e;
+    border-radius: 50px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 8px rgba(255, 123, 0, 0.4);
+}
+
+.barra-energia > div {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #f0c75e, #ffcc00);
+    transition: width 0.2s;
+}
+
+.teclas {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.tecla {
+    width: 70px;
+    padding: 8px 0;
+    color: #fff;
+    border: 2px solid #f0c75e;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    box-shadow: 0 0 8px rgba(255, 123, 0, 0.4);
+    background: rgba(255, 255, 255, 0.08);
+    transition: all 0.1s;
+}
+
+.tecla.activa {
+    background: #f0c75e;
+    color: #000;
+    transform: translateY(2px);
+    box-shadow: 0 0 20px rgba(255, 123, 0, 0.8);
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 2px solid #f0c75e;
+    border-radius: 20px;
+    box-shadow: 0 0 15px rgba(255, 123, 0, 0.5), inset 0 0 10px rgba(255, 123, 0, 0.15);
+    background: #160802;
+    margin-bottom: 15px;
+}
+
+.mensaje {
+    color: #fff;
+    font-size: 16px;
+    margin-top: 5px;
+    min-height: 20px;
+}
+</style>
+<link rel="stylesheet" href="estilos.css">
+<style>
+    body {
+        background:
+            radial-gradient(ellipse 80% 55% at 50% -10%, rgba(124, 58, 237, .38), transparent 60%),
+            radial-gradient(ellipse 55% 45% at 88% 110%, rgba(245, 158, 11, .20), transparent 60%),
+            linear-gradient(180deg, #150b33 0%, #0f0626 55%, #080213 100%);
+        background-attachment: fixed;
+        font-family: 'IM Fell English', Georgia, serif;
+        overflow-x: hidden;
+    }
+    .estrellas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .contenedor { border-color: rgba(240, 199, 94, .55); box-shadow: 0 0 30px rgba(240, 199, 94, .15), 0 25px 70px rgba(0, 0, 0, .55), inset 0 0 45px rgba(124, 58, 237, .1); }
+    .titulo { font-family: 'Cinzel', serif; color: #ffe9a8; letter-spacing: 2px; text-shadow: 0 0 18px rgba(240, 199, 94, .55), 0 4px 12px rgba(0, 0, 0, .6); }
+    .pantalla-menu .subtitulo { color: rgba(240, 230, 200, .82); }
+    button, .btn-nivel { border-color: #f0c75e; color: #ffe9a8; box-shadow: 0 0 12px rgba(240, 199, 94, .3), inset 0 0 12px rgba(240, 199, 94, .1); }
+    button:hover, .btn-nivel:hover:not(:disabled) { background: #f0c75e; color: #22143f; box-shadow: 0 0 28px rgba(240, 199, 94, .75); }
+    .btn-nivel:disabled { border-color: rgba(255, 255, 255, .25); color: rgba(255, 255, 255, .35); box-shadow: none; }
+    .btn-nivel.completado { border-color: #9be29b; color: #9be29b; box-shadow: 0 0 8px rgba(155, 226, 155, .4); }
+    .info span, .barra-energia, .tecla, canvas { border-color: #f0c75e; box-shadow: 0 0 12px rgba(240, 199, 94, .3), inset 0 0 12px rgba(240, 199, 94, .1); }
+    .barra-energia > div { background: linear-gradient(90deg, #f0c75e, #ffe9a8); }
+    .tecla.activa { background: #f0c75e; color: #22143f; box-shadow: 0 0 20px rgba(240, 199, 94, .8); }
+    .mensaje { color: #e9dcc0; }
+</style>
+</head>
+<body>
+  <div class="estrellas" id="estrellas"></div>
+
+  <div class="contenedor">
+    <div id="pantalla-menu" class="pantalla-menu">
+        <h1 class="titulo">🎸 Guitar Hero</h1>
+        <p class="subtitulo">Elige un nivel. ¡Cada nivel es más difícil! Teclas: D F J K L</p>
+        <div class="rejilla-niveles" id="rejilla-niveles"></div>
+        <button type="button" onclick="window.location.href='menu.html'">Volver al Menú</button>
+    </div>
+
+    <div id="pantalla-juego" class="pantalla-juego">
+        <h1 class="titulo" id="titulo-juego">Guitar Hero</h1>
+        <div class="info">
+            <span>Nivel: <b id="info-nivel">1</b></span>
+            <div class="barra-energia"><div id="barra-energia"></div></div>
+            <span>Combo: <b id="info-combo">0</b></span>
+        </div>
+        <div class="teclas" id="teclas">
+            <div class="tecla" id="tecla-0">D</div>
+            <div class="tecla" id="tecla-1">F</div>
+            <div class="tecla" id="tecla-2">J</div>
+            <div class="tecla" id="tecla-3">K</div>
+            <div class="tecla" id="tecla-4">L</div>
+        </div>
+        <canvas id="lienzo" width="600" height="400"></canvas>
+        <p class="mensaje" id="mensaje">Presiona las teclas D F J K L cuando las notas lleguen a la zona de golpe</p>
+        <button type="button" id="btn-salir">Salir al menú</button>
+    </div>
+  </div>
+
+<script>
+const STORAGE = 'gh_progreso';
+const TOTAL_NIVELES = 30;
+const LANES = 5;
+const TECLAS = ['KeyD', 'KeyF', 'KeyJ', 'KeyK', 'KeyL'];
+const COLORES = ['#f0c75e', '#ffaa00', '#ff5500', '#ffcc00', '#ff3300'];
+const ANCHO = 600;
+const ALTO = 400;
+const ANCHO_CARRIL = ANCHO / LANES;
+const ALTO_NOTA = 26;
+const HIT_Y = 300;
+const TOLERANCIA = 48;
+const PERFECTO = 16;
+
+const canvas = document.getElementById('lienzo');
+const ctx = canvas.getContext('2d');
+
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+        if (typeof r === 'number') r = [r, r, r, r];
+        const [tl, tr, br, bl] = r;
+        this.moveTo(x + tl, y);
+        this.lineTo(x + w - tr, y);
+        this.quadraticCurveTo(x + w, y, x + w, y + tr);
+        this.lineTo(x + w, y + h - br);
+        this.quadraticCurveTo(x + w, y + h, x + w - br, y + h);
+        this.lineTo(x + bl, y + h);
+        this.quadraticCurveTo(x, y + h, x, y + h - bl);
+        this.lineTo(x, y + tl);
+        this.quadraticCurveTo(x, y, x + tl, y);
+        return this;
+    };
+}
+
+let desbloqueados = 1;
+let nivelActual = 1;
+let jugando = false;
+let animacion = null;
+
+let energia = 100;
+let combo = 0;
+let maxCombo = 0;
+let puntaje = 0;
+let totalNotas = 0;
+let notasAcertadas = 0;
+let notasActivas = [];
+let pendientes = 0;
+let tiempoSiguiente = 0;
+let frames = 0;
+let velocidad = 0;
+let dobleChance = 0;
+let particulas = [];
+let textos = [];
+
+function cargarProgreso() {
+    const guardado = localStorage.getItem(STORAGE);
+    desbloqueados = guardado ? parseInt(guardado, 10) : 1;
+}
+
+function guardarProgreso() {
+    if (desbloqueados > (parseInt(localStorage.getItem(STORAGE), 10) || 1)) {
+        localStorage.setItem(STORAGE, String(desbloqueados));
+    }
+}
+
+function construirMenu() {
+    const rejilla = document.getElementById('rejilla-niveles');
+    rejilla.innerHTML = '';
+    for (let i = 1; i <= TOTAL_NIVELES; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'btn-nivel';
+        btn.textContent = i;
+        btn.disabled = i > desbloqueados;
+        if (i < desbloqueados) btn.classList.add('completado');
+        btn.addEventListener('click', () => iniciarNivel(i));
+        rejilla.appendChild(btn);
+    }
+}
+
+function mostrarMenu() {
+    jugando = false;
+    if (animacion) cancelAnimationFrame(animacion);
+    cargarProgreso();
+    construirMenu();
+    document.getElementById('pantalla-juego').style.display = 'none';
+    document.getElementById('pantalla-menu').style.display = 'block';
+}
+
+function configurarNivel(n) {
+    nivelActual = n;
+    velocidad = 2.8 + n * 0.3;
+    dobleChance = Math.min(0.4, n * 0.013);
+    const gapBase = Math.max(16, 46 - Math.floor(n * 0.9));
+    totalNotas = 22 + n * 3;
+    pendientes = totalNotas;
+    tiempoSiguiente = 40;
+    energia = 100;
+    combo = 0;
+    maxCombo = 0;
+    puntaje = 0;
+    notasAcertadas = 0;
+    notasActivas = [];
+    particulas = [];
+    textos = [];
+    frames = 0;
+    document.getElementById('info-nivel').textContent = n;
+    document.getElementById('info-combo').textContent = '0';
+    document.getElementById('barra-energia').style.width = '100%';
+}
+
+function iniciarNivel(n) {
+    configurarNivel(n);
+    document.getElementById('pantalla-menu').style.display = 'none';
+    document.getElementById('pantalla-juego').style.display = 'block';
+    document.getElementById('titulo-juego').textContent = 'Nivel ' + n;
+    document.getElementById('mensaje').textContent = '¡A tocar! Nivel ' + n;
+    jugando = true;
+    if (animacion) cancelAnimationFrame(animacion);
+    actualizar();
+}
+
+function terminarNivel(exito) {
+    jugando = false;
+    if (animacion) cancelAnimationFrame(animacion);
+    const mensaje = document.getElementById('mensaje');
+    if (exito) {
+        if (nivelActual >= desbloqueados) desbloqueados = nivelActual + 1;
+        guardarProgreso();
+        mensaje.textContent = '¡Nivel ' + nivelActual + ' superado! Puntaje: ' + puntaje + ' | Combo máximo: ' + maxCombo;
+    } else {
+        mensaje.textContent = 'Te quedaste sin energía en el nivel ' + nivelActual + '. ¡Inténtalo de nuevo!';
+    }
+}
+
+function generarNota() {
+    const carril = Math.floor(Math.random() * LANES);
+    notasActivas.push({ carril: carril, y: -ALTO_NOTA - 10, acertada: false });
+    if (Math.random() < dobleChance) {
+        let otro = Math.floor(Math.random() * (LANES - 1));
+        if (otro >= carril) otro++;
+        notasActivas.push({ carril: otro, y: -ALTO_NOTA - 10, acertada: false });
+    }
+}
+
+function golpear(carril) {
+    let mejor = null;
+    let mejorDist = TOLERANCIA + 1;
+    for (const nota of notasActivas) {
+        if (nota.carril !== carril || nota.acertada) continue;
+        const dist = Math.abs(nota.y - HIT_Y);
+        if (dist < mejorDist) {
+            mejorDist = dist;
+            mejor = nota;
+        }
+    }
+
+    if (!mejor) {
+        perderEnergia(4);
+        return;
+    }
+
+    mejor.acertada = true;
+    notasAcertadas++;
+    combo++;
+    if (combo > maxCombo) maxCombo = combo;
+
+    const perfecto = mejorDist <= PERFECTO;
+    const valor = perfecto ? 300 : 100;
+    puntaje += valor * Math.min(4, 1 + Math.floor(combo / 5));
+
+    ganarEnergia(perfecto ? 3 : 2);
+
+    particulas.push({ x: mejor.carril * ANCHO_CARRIL + ANCHO_CARRIL / 2, y: HIT_Y, vida: 20 });
+    textos.push({ x: mejor.carril * ANCHO_CARRIL + ANCHO_CARRIL / 2, y: HIT_Y - 30, texto: (perfecto ? '¡PERFECTO! ' : '') + '+' + (valor * Math.min(4, 1 + Math.floor(combo / 5))), vida: 40 });
+}
+
+function perderEnergia(cantidad) {
+    energia = Math.max(0, energia - cantidad);
+    actualizarBarra();
+    if (energia <= 0) {
+        terminarNivel(false);
+    }
+}
+
+function ganarEnergia(cantidad) {
+    energia = Math.min(100, energia + cantidad);
+    actualizarBarra();
+}
+
+function actualizarBarra() {
+    document.getElementById('barra-energia').style.width = energia + '%';
+}
+
+function dibujarFondo() {
+    const grad = ctx.createLinearGradient(0, 0, 0, ALTO);
+    grad.addColorStop(0, '#1c0a04');
+    grad.addColorStop(0.7, '#3a0f05');
+    grad.addColorStop(1, '#4a1506');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, ANCHO, ALTO);
+
+    ctx.strokeStyle = 'rgba(255, 123, 0, 0.15)';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < LANES; i++) {
+        const x = i * ANCHO_CARRIL;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, ALTO);
+        ctx.stroke();
+    }
+
+    const scroll = frames % 24;
+    ctx.strokeStyle = 'rgba(255, 123, 0, 0.1)';
+    for (let y = scroll; y < ALTO; y += 24) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(ANCHO, y);
+        ctx.stroke();
+    }
+
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.fillRect(0, HIT_Y - 30, ANCHO, 60);
+
+    ctx.shadowColor = '#f0c75e';
+    ctx.shadowBlur = 12;
+    ctx.fillStyle = 'rgba(255, 123, 0, 0.85)';
+    ctx.fillRect(0, HIT_Y - 3, ANCHO, 6);
+    ctx.shadowBlur = 0;
+
+    ctx.font = 'bold 14px Arial';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.textAlign = 'center';
+    ctx.fillText('ZONA DE GOLPE', ANCHO / 2, HIT_Y - 40);
+}
+
+function dibujarNotas() {
+    for (const nota of notasActivas) {
+        if (nota.acertada) continue;
+        const x = nota.carril * ANCHO_CARRIL + ANCHO_CARRIL / 2;
+        const y = nota.y;
+        const color = COLORES[nota.carril];
+
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 15;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.roundRect(x - 34, y, 68, ALTO_NOTA, 8);
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.beginPath();
+        ctx.roundRect(x - 34, y, 68, 8, 4);
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+        ctx.beginPath();
+        ctx.roundRect(x - 34, y + 18, 68, 8, 4);
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+    }
+}
+
+function dibujarParticulas() {
+    for (const p of particulas) {
+        const alfa = p.vida / 20;
+        ctx.globalAlpha = alfa;
+        ctx.fillStyle = '#f0c75e';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 8 + (20 - p.vida), 0, Math.PI * 2);
+        ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+}
+
+function dibujarTextos() {
+    for (const t of textos) {
+        ctx.globalAlpha = Math.min(1, t.vida / 20);
+        ctx.font = 'bold 16px Arial';
+        ctx.fillStyle = '#ffcc00';
+        ctx.textAlign = 'center';
+        ctx.fillText(t.texto, t.x, t.y);
+    }
+    ctx.globalAlpha = 1;
+}
+
+function actualizar() {
+    frames++;
+    const gapBase = Math.max(16, 46 - Math.floor(nivelActual * 0.9));
+
+    if (tiempoSiguiente > 0) {
+        tiempoSiguiente--;
+    } else if (pendientes > 0) {
+        generarNota();
+        pendientes--;
+        tiempoSiguiente = gapBase + Math.floor(Math.random() * 16);
+    }
+
+    for (let i = notasActivas.length - 1; i >= 0; i--) {
+        const nota = notasActivas[i];
+        nota.y += velocidad;
+        if (nota.acertada) {
+            notasActivas.splice(i, 1);
+            continue;
+        }
+        if (nota.y > HIT_Y + TOLERANCIA) {
+            notasActivas.splice(i, 1);
+            combo = 0;
+            document.getElementById('info-combo').textContent = '0';
+            perderEnergia(10);
+            textos.push({ x: nota.carril * ANCHO_CARRIL + ANCHO_CARRIL / 2, y: HIT_Y - 20, texto: 'FALLADO', vida: 30 });
+        }
+    }
+
+    for (let i = particulas.length - 1; i >= 0; i--) {
+        particulas[i].vida--;
+        if (particulas[i].vida <= 0) particulas.splice(i, 1);
+    }
+    for (let i = textos.length - 1; i >= 0; i--) {
+        textos[i].vida--;
+        textos[i].y -= 1;
+        if (textos[i].vida <= 0) textos.splice(i, 1);
+    }
+
+    document.getElementById('info-combo').textContent = combo;
+
+    dibujarFondo();
+    dibujarNotas();
+    dibujarParticulas();
+    dibujarTextos();
+
+    ctx.font = 'bold 20px Arial';
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'right';
+    ctx.fillText('Puntaje: ' + puntaje, ANCHO - 15, 30);
+
+    if (!jugando) return;
+
+    if (pendientes === 0 && notasActivas.length === 0) {
+        terminarNivel(true);
+        return;
+    }
+
+    if (energia <= 0) {
+        terminarNivel(false);
+        return;
+    }
+
+    animacion = requestAnimationFrame(actualizar);
+}
+
+document.addEventListener('keydown', (e) => {
+    const idx = TECLAS.indexOf(e.code);
+    if (idx === -1) return;
+    e.preventDefault();
+    const tecla = document.getElementById('tecla-' + idx);
+    tecla.classList.add('activa');
+    setTimeout(() => tecla.classList.remove('activa'), 100);
+    if (jugando) golpear(idx);
+});
+
+document.getElementById('btn-salir').addEventListener('click', mostrarMenu);
+
+mostrarMenu();
+</script>
+<script src="magia.js"></script>
+<script>verificarSesion();</script>
+</body>
+</html>
