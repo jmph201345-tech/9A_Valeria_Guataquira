@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portafolio - Valeria Guataquira</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Caveat:wght@400;600;700&family=IM+Fell+English&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    min-height: 100vh;
+}
+
+body {
+    font-family: 'IM Fell English', Georgia, 'Times New Roman', serif;
+    color: #f0e6c8;
+    background:
+        radial-gradient(ellipse 80% 55% at 50% -10%, rgba(124, 58, 237, .38), transparent 60%),
+        radial-gradient(ellipse 55% 45% at 88% 110%, rgba(245, 158, 11, .20), transparent 60%),
+        radial-gradient(ellipse 55% 45% at 8% 110%, rgba(59, 130, 246, .16), transparent 60%),
+        linear-gradient(180deg, #150b33 0%, #0f0626 55%, #080213 100%);
+    background-attachment: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px 12px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.estrellas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.estrella {
+    position: absolute;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 6px rgba(255, 255, 255, .9);
+    opacity: .15;
+    animation: brillar var(--d, 3s) ease-in-out infinite;
+}
+
+@keyframes brillar {
+    0%, 100% { opacity: .1; transform: scale(.7); }
+    50% { opacity: .95; transform: scale(1.2); }
+}
+
+.luna {
+    position: fixed;
+    top: 30px;
+    right: 42px;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fffbe0, #f6d988 60%, #d9a83f);
+    box-shadow: 0 0 60px 18px rgba(246, 217, 136, .35);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.luna::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    top: 16px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba(120, 100, 60, .35);
+    box-shadow: 22px 26px 0 -2px rgba(120, 100, 60, .3), 8px 52px 0 -1px rgba(120, 100, 60, .25);
+}
+
+.tarjeta {
+    position: relative;
+    z-index: 1;
+    width: 92%;
+    max-width: 470px;
+    padding: 38px 40px;
+    background: linear-gradient(160deg, rgba(47, 26, 96, .88), rgba(18, 9, 48, .94));
+    border: 2px solid rgba(240, 199, 94, .55);
+    border-radius: 20px;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .05), 0 0 30px rgba(240, 199, 94, .14), 0 25px 70px rgba(0, 0, 0, .55), inset 0 0 45px rgba(124, 58, 237, .10);
+    text-align: center;
+}
+
+.tarjeta-ancha {
+    max-width: 720px;
+}
+
+.titulo {
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    font-size: 34px;
+    color: #ffe9a8;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+    text-shadow: 0 0 18px rgba(240, 199, 94, .55), 0 4px 12px rgba(0, 0, 0, .6);
+}
+
+.subtitulo {
+    color: rgba(240, 230, 200, .82);
+    font-size: 17px;
+    margin-bottom: 22px;
+}
+
+.ornamento {
+    font-size: 20px;
+    color: #f0c75e;
+    letter-spacing: 10px;
+    margin-bottom: 6px;
+    text-shadow: 0 0 14px rgba(240, 199, 94, .8);
+}
+
+label {
+    display: block;
+    text-align: left;
+    color: #e9dcc0;
+    font-size: 15px;
+    margin: 14px 0 6px;
+    letter-spacing: .5px;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, .35);
+    border: 2px solid rgba(240, 199, 94, .4);
+    border-radius: 10px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 16px;
+    outline: none;
+    transition: border-color .3s, box-shadow .3s;
+}
+
+input:focus, textarea:focus {
+    border-color: #f0c75e;
+    box-shadow: 0 0 16px rgba(240, 199, 94, .4);
+}
+
+input::placeholder, textarea::placeholder {
+    color: rgba(240, 230, 200, .45);
+}
+
+.boton {
+    width: 100%;
+    margin-top: 20px;
+    padding: 13px 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 17px;
+    letter-spacing: 1px;
+    color: #ffe9a8;
+    background: linear-gradient(135deg, rgba(240, 199, 94, .18), rgba(240, 199, 94, .04));
+    border: 2px solid #f0c75e;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 0 14px rgba(240, 199, 94, .3), inset 0 0 14px rgba(240, 199, 94, .10);
+    transition: all .3s;
+}
+
+.boton:hover {
+    background: #f0c75e;
+    color: #22143f;
+    box-shadow: 0 0 28px rgba(240, 199, 94, .75);
+    transform: translateY(-2px);
+}
+
+.boton:active {
+    transform: translateY(0);
+}
+
+.boton-secundario {
+    background: transparent;
+    color: #e9dcc0;
+    border-color: rgba(240, 230, 200, .5);
+    box-shadow: none;
+}
+
+.boton-secundario:hover {
+    background: #e9dcc0;
+    color: #22143f;
+    box-shadow: 0 0 20px rgba(240, 230, 200, .6);
+}
+
+.mensaje {
+    min-height: 20px;
+    margin-top: 14px;
+    font-size: 15px;
+    color: #ffb4a2;
+    text-align: center;
+}
+
+.mensaje-exito {
+    color: #9be29b;
+}
+
+.pie {
+    margin-top: 20px;
+    color: rgba(240, 230, 200, .7);
+    font-size: 15px;
+}
+
+.pie a, .enlace {
+    color: #f0c75e;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(240, 199, 94, .5);
+}
+
+.pie a:hover {
+    color: #ffe9a8;
+}
+
+.barra-acciones {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.barra-acciones .boton {
+    width: auto;
+    margin-top: 0;
+    padding: 11px 18px;
+    font-size: 14px;
+}
+
+.opciones {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 22px;
+}
+
+.opcion {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 18px 22px;
+    background: rgba(0, 0, 0, .25);
+    border: 2px solid rgba(240, 199, 94, .45);
+    border-radius: 14px;
+    text-decoration: none;
+    color: #ffe9a8;
+    font-size: 19px;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+    transition: all .3s;
+    box-shadow: 0 0 12px rgba(240, 199, 94, .12), inset 0 0 18px rgba(124, 58, 237, .06);
+}
+
+.opcion:hover {
+    background: #f0c75e;
+    color: #22143f;
+    transform: translateY(-2px);
+    box-shadow: 0 0 26px rgba(240, 199, 94, .6);
+}
+
+.opcion .imagen {
+    font-size: 34px;
+    width: 46px;
+    text-align: center;
+}
+
+.saludo {
+    color: #f0c75e;
+    font-size: 16px;
+    font-style: italic;
+}
+
+.presentacion {
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+    text-align: left;
+    flex-wrap: wrap;
+}
+
+.marco-imagen {
+    flex: 0 0 190px;
+    height: 220px;
+    padding: 8px;
+    border: 3px double rgba(240, 199, 94, .7);
+    border-radius: 12px;
+    box-shadow: 0 0 22px rgba(240, 199, 94, .25), inset 0 0 18px rgba(124, 58, 237, .2);
+    background: rgba(0, 0, 0, .25);
+}
+
+.marco-imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.contenido-presentacion {
+    flex: 1;
+    min-width: 250px;
+}
+
+.nombre {
+    font-family: 'Cinzel', serif;
+    font-size: 30px;
+    color: #ffe9a8;
+    margin-top: 6px;
+    text-shadow: 0 0 14px rgba(240, 199, 94, .4);
+}
+
+.parrafo {
+    font-size: 17px;
+    line-height: 1.6;
+    color: #eadfc2;
+    margin-top: 10px;
+}
+
+.tabla-caja {
+    margin-top: 26px;
+    text-align: left;
+}
+
+.tabla-caja h2 {
+    font-family: 'Cinzel', serif;
+    color: #ffe9a8;
+    font-size: 22px;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.tabla {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(0, 0, 0, .28);
+}
+
+.tabla th, .tabla td {
+    border: 1px solid rgba(240, 199, 94, .25);
+    padding: 8px 10px;
+    text-align: center;
+    color: #f0e6c8;
+    font-size: 14px;
+}
+
+.tabla th {
+    background: rgba(124, 58, 237, .35);
+    color: #ffe9a8;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+    font-size: 13px;
+}
+
+.tabla tr:nth-child(even) td {
+    background: rgba(124, 58, 237, .08);
+}
+
+.modo-hacker th {
+    background: #f0c75e !important;
+    color: #22143f !important;
+}
+
+.modo-hacker td {
+    background: rgba(240, 199, 94, .25) !important;
+    color: #22143f !important;
+}
+</style>
+</head>
+<body>
+    <div class="luna"></div>
+    <div class="estrellas" id="estrellas"></div>
+
+    <div class="tarjeta tarjeta-ancha">
+        <div class="ornamento">✦ ❖ ✦</div>
+        <h1 class="titulo">Portafolio</h1>
+        <p class="subtitulo">El rincón mágico de Valeria</p>
+
+        <div class="presentacion">
+            <div class="marco-imagen">
+                <img src="imagen.png" alt="Valeria">
+            </div>
+            <div class="contenido-presentacion">
+                <h2 class="nombre">Valeria Guataquira</h2>
+                <p class="parrafo">Hola, soy Valeria, estudiante del Liceo Santa Bernardita (LSB). Tengo 14 años, me gusta la música, me gusta el arte y mi color favorito es el rojo.</p>
+
+                <div class="barra-acciones">
+                    <button type="button" class="boton" id="btn-toggle">Mostrar horario</button>
+                    <button type="button" class="boton boton-secundario" id="btn-color">Modo dragón</button>
+                    <button type="button" class="boton boton-secundario" onclick="window.location.href='menu.html'">Volver al menú</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabla-caja" id="horario" style="display:none;">
+            <h2>Horario de clases</h2>
+            <div style="overflow-x:auto;">
+                <table class="tabla" id="tabla-clases">
+                    <tr>
+                        <th>Día 1</th>
+                        <th>Día 2</th>
+                        <th>Día 3</th>
+                        <th>Día 4</th>
+                        <th>Día 5</th>
+                        <th>Día 6</th>
+                        <th>Día 7</th>
+                    </tr>
+                    <tr>
+                        <td>Biología</td>
+                        <td>Edu. Física</td>
+                        <td>Español</td>
+                        <td>Francés</td>
+                        <td>Biología</td>
+                        <td>Edu. Física</td>
+                        <td>Inglés</td>
+                    </tr>
+                    <tr>
+                        <td>Geometría</td>
+                        <td>Sociales</td>
+                        <td>Sociales</td>
+                        <td>Español</td>
+                        <td>Math</td>
+                        <td>Inglés (MEL)</td>
+                        <td>Sociales</td>
+                    </tr>
+                    <tr>
+                        <td>Descanso</td>
+                        <td>Descanso</td>
+                        <td>Descanso</td>
+                        <td>Descanso</td>
+                        <td>Descanso</td>
+                        <td>Descanso</td>
+                        <td>Descanso</td>
+                    </tr>
+                    <tr>
+                        <td>Español</td>
+                        <td>Francés</td>
+                        <td>Math</td>
+                        <td>Tech</td>
+                        <td>Inglés</td>
+                        <td>Francés</td>
+                        <td>Robótica</td>
+                    </tr>
+                    <tr>
+                        <td>Sociales</td>
+                        <td>Math</td>
+                        <td>Física</td>
+                        <td>Inglés</td>
+                        <td>Sociales</td>
+                        <td>Math</td>
+                        <td>Química</td>
+                    </tr>
+                    <tr>
+                        <td>Francés</td>
+                        <td>Skills</td>
+                        <td>Danzas</td>
+                        <td>Ética</td>
+                        <td>Dibujo</td>
+                        <td>Sociales</td>
+                        <td>Biología</td>
+                    </tr>
+                    <tr>
+                        <td>Break</td>
+                        <td>Break</td>
+                        <td>Break</td>
+                        <td>Break</td>
+                        <td>Break</td>
+                        <td>Break</td>
+                        <td>Break</td>
+                    </tr>
+                    <tr>
+                        <td>Cátedra de la Paz</td>
+                        <td>Español</td>
+                        <td>PILEO</td>
+                        <td>Biología</td>
+                        <td>Skills</td>
+                        <td>PILEO</td>
+                        <td>Español</td>
+                    </tr>
+                    <tr>
+                        <td>Inglés</td>
+                        <td>Inglés</td>
+                        <td>Biología</td>
+                        <td>Math</td>
+                        <td>Danzas</td>
+                        <td>Informática</td>
+                        <td>Math</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+function crearEstrellas(cantidad) {
+    var contenedor = document.getElementById('estrellas');
+    if (!contenedor) return;
+    for (var i = 0; i < cantidad; i++) {
+        var e = document.createElement('div');
+        e.className = 'estrella';
+        var tam = (Math.random() * 3 + 1).toFixed(1);
+        e.style.width = tam + 'px';
+        e.style.height = tam + 'px';
+        e.style.left = (Math.random() * 100).toFixed(2) + '%';
+        e.style.top = (Math.random() * 100).toFixed(2) + '%';
+        e.style.setProperty('--d', (Math.random() * 3 + 2).toFixed(1) + 's');
+        e.style.animationDelay = (Math.random() * 4).toFixed(1) + 's';
+        contenedor.appendChild(e);
+    }
+}
+
+crearEstrellas(80);
+
+function leerUsuarios() {
+    try {
+        return JSON.parse(localStorage.getItem('usuarios') || '{}');
+    } catch (e) {
+        return {};
+    }
+}
+
+function guardarUsuarios(usuarios) {
+    try {
+        localStorage.setItem('usuarios', JSON.stringify(usuarios));
+    } catch (e) {}
+}
+
+function sesionActiva() {
+    try {
+        return !!sessionStorage.getItem('sesion');
+    } catch (e) {
+        return false;
+    }
+}
+
+function usuarioActual() {
+    try {
+        return sessionStorage.getItem('sesion') || '';
+    } catch (e) {
+        return '';
+    }
+}
+
+function iniciarSesion(usuario) {
+    try {
+        sessionStorage.setItem('sesion', usuario);
+    } catch (e) {}
+}
+
+function verificarSesion() {
+    if (!sesionActiva()) {
+        window.location.href = 'Login.html';
+    }
+}
+
+function cerrarSesion() {
+    try {
+        sessionStorage.removeItem('sesion');
+    } catch (e) {}
+    window.location.href = 'Login.html';
+}
+    </script>
+    <script>
+        verificarSesion();
+
+        var horario = document.getElementById('horario');
+        var btn = document.getElementById('btn-toggle');
+
+        btn.addEventListener('click', function () {
+            var visible = horario.style.display !== 'none';
+            horario.style.display = visible ? 'none' : 'block';
+            btn.textContent = visible ? 'Mostrar horario' : 'Ocultar horario';
+        });
+
+        var botonColor = document.getElementById('btn-color');
+        var miTabla = document.getElementById('tabla-clases');
+
+        botonColor.addEventListener('click', function () {
+            miTabla.classList.toggle('modo-hacker');
+        });
+    </script>
+</body>
+</html>
