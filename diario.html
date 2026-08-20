@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diario Secreto - Reino Mágico</title>
+<link rel="stylesheet" href="estilos.css">
+<style>
+    .candado .pie {
+        margin-top: 26px;
+    }
+
+    .cuaderno {
+        position: relative;
+        z-index: 1;
+        width: 94%;
+        max-width: 680px;
+        background: #fdf6e3;
+        color: #3a2f1e;
+        border-radius: 10px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, .5), 0 0 40px rgba(240, 199, 94, .12);
+        padding: 34px 34px 30px 56px;
+        font-family: 'Caveat', cursive;
+        text-align: left;
+    }
+
+    .cuaderno::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 34px;
+        background-image: radial-gradient(circle at 50% 12px, rgba(60, 50, 30, .55) 3px, transparent 3.6px);
+        background-size: 34px 26px;
+        background-repeat: repeat-y;
+        border-right: 2px solid rgba(60, 50, 30, .18);
+    }
+
+    .cuaderno-titulo {
+        font-family: 'Cinzel', serif;
+        color: #5a4632;
+        font-size: 26px;
+        text-align: center;
+        letter-spacing: 2px;
+        border-bottom: 2px solid #5a4632;
+        padding-bottom: 8px;
+        margin-bottom: 12px;
+    }
+
+    .cuaderno-fecha {
+        font-size: 22px;
+        color: #7a6a52;
+        margin-bottom: 8px;
+        text-align: center;
+    }
+
+    .entrada-titulo {
+        width: 100%;
+        font-family: 'Caveat', cursive;
+        font-size: 26px;
+        padding: 8px 12px;
+        border: none;
+        border-bottom: 2px dashed rgba(90, 70, 50, .4);
+        background: transparent;
+        color: #3a2f1e;
+        border-radius: 0;
+    }
+
+    .entrada-titulo:focus {
+        box-shadow: none;
+        border-color: #a8894a;
+    }
+
+    .entrada-texto {
+        width: 100%;
+        min-height: 280px;
+        margin-top: 14px;
+        background-color: #fffdf5;
+        background-image: repeating-linear-gradient(to bottom, transparent 0 30px, rgba(90, 80, 50, .30) 30px 31px);
+        border-top: 3px solid #e06c5f;
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+        border-radius: 0;
+        padding: 2px 12px;
+        font-family: 'Caveat', cursive;
+        font-size: 25px;
+        line-height: 31px;
+        color: #3a2f1e;
+        resize: vertical;
+        outline: none;
+    }
+
+    .cuaderno .boton {
+        color: #5a4632;
+        border-color: #5a4632;
+        background: transparent;
+        box-shadow: none;
+        font-family: 'Cinzel', serif;
+    }
+
+    .cuaderno .boton:hover {
+        background: #5a4632;
+        color: #fdf6e3;
+        box-shadow: 0 0 18px rgba(90, 70, 50, .4);
+    }
+
+    .botones-cuaderno {
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-top: 16px;
+    }
+
+    .botones-cuaderno .boton {
+        width: auto;
+        flex: 1;
+        min-width: 150px;
+        margin-top: 0;
+    }
+
+    .entradas-anteriores {
+        margin-top: 20px;
+    }
+
+    .entradas-anteriores h3 {
+        font-family: 'Cinzel', serif;
+        color: #5a4632;
+        letter-spacing: 1px;
+        font-size: 18px;
+        border-bottom: 1px solid rgba(90, 70, 50, .4);
+        padding-bottom: 6px;
+        margin-bottom: 10px;
+    }
+
+    .entrada-item {
+        background: rgba(90, 70, 50, .08);
+        border-left: 4px solid #5a4632;
+        padding: 8px 12px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background .2s;
+    }
+
+    .entrada-item:hover {
+        background: rgba(90, 70, 50, .16);
+    }
+
+    .entrada-item .encabezado {
+        font-size: 22px;
+        color: #5a4632;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .entrada-item .borrar {
+        cursor: pointer;
+        font-size: 16px;
+        background: none;
+        border: none;
+        color: #c0392b;
+        padding: 2px 6px;
+    }
+
+    .entrada-item .preview {
+        font-size: 20px;
+        color: #6b5b42;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    .vacio {
+        color: #8a7a60;
+        font-size: 20px;
+        font-style: italic;
+        text-align: center;
+    }
+</style>
+</head>
+<body>
+    <div class="luna"></div>
+    <div class="estrellas" id="estrellas"></div>
+
+    <div class="tarjeta candado" id="pantalla-candado">
+        <div class="ornamento">✦ ❖ ✦</div>
+        <h1 class="titulo">Diario Secreto</h1>
+        <p class="subtitulo">Este diario está protegido con magia. Solo quien conozca la contraseña podrá abrirlo.</p>
+
+        <form id="form-abrir">
+            <label for="clave">Contraseña del diario</label>
+            <input type="password" id="clave" placeholder="Ingresa tu contraseña mágica" required>
+            <p class="mensaje" id="mensaje-abrir"></p>
+            <button type="submit" class="boton">Abrir diario 🔓</button>
+        </form>
+
+        <form id="form-crear">
+            <label for="nueva-clave">Crea la contraseña de tu diario</label>
+            <input type="password" id="nueva-clave" placeholder="Mínimo 4 caracteres" required>
+            <label for="nueva-clave2">Confirmar contraseña</label>
+            <input type="password" id="nueva-clave2" placeholder="Repite tu contraseña" required>
+            <p class="mensaje" id="mensaje-crear"></p>
+            <button type="submit" class="boton">Proteger mi diario 🔐</button>
+        </form>
+
+        <p class="pie"><a href="menu.html">Volver al menú</a></p>
+    </div>
+
+    <div class="cuaderno" id="pantalla-cuaderno" style="display:none;">
+        <h2 class="cuaderno-titulo">📔 Mi Diario Mágico</h2>
+        <p class="cuaderno-fecha" id="fecha-hoy"></p>
+
+        <input type="text" id="entrada-titulo" class="entrada-titulo" placeholder="Título de tu entrada...">
+        <textarea id="entrada-texto" class="entrada-texto" placeholder="Escribe aquí tus aventuras del día..."></textarea>
+
+        <div class="botones-cuaderno">
+            <button type="button" class="boton" id="btn-guardar">Guardar entrada</button>
+            <button type="button" class="boton" id="btn-cerrar">Cerrar diario</button>
+        </div>
+
+        <div class="entradas-anteriores">
+            <h3>Entradas anteriores</h3>
+            <div id="lista-entradas"></div>
+        </div>
+    </div>
+
+    <script src="magia.js"></script>
+    <script>
+        verificarSesion();
+
+        var candado = document.getElementById('pantalla-candado');
+        var cuaderno = document.getElementById('pantalla-cuaderno');
+        var formAbrir = document.getElementById('form-abrir');
+        var formCrear = document.getElementById('form-crear');
+        var mensajeAbrir = document.getElementById('mensaje-abrir');
+        var mensajeCrear = document.getElementById('mensaje-crear');
+
+        function leerDiario() {
+            var clave = 'diario_' + usuarioActual();
+            try {
+                var datos = JSON.parse(localStorage.getItem(clave) || 'null');
+                if (datos && typeof datos === 'object') {
+                    if (!datos.password) datos.password = '';
+                    if (!datos.entradas) datos.entradas = [];
+                    return datos;
+                }
+            } catch (e) {}
+            return { password: '', entradas: [] };
+        }
+
+        function guardarDiario(datos) {
+            try {
+                localStorage.setItem('diario_' + usuarioActual(), JSON.stringify(datos));
+            } catch (e) {}
+        }
+
+        var diario = leerDiario();
+
+        function inicializarPantalla() {
+            if (diario.password) {
+                formAbrir.style.display = 'block';
+                formCrear.style.display = 'none';
+            } else {
+                formAbrir.style.display = 'none';
+                formCrear.style.display = 'block';
+            }
+        }
+
+        function fechaHoy() {
+            var opciones = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            return new Date().toLocaleDateString('es-ES', opciones);
+        }
+
+        function abrirCuaderno() {
+            candado.style.display = 'none';
+            cuaderno.style.display = 'block';
+            document.getElementById('fecha-hoy').textContent = fechaHoy();
+            document.getElementById('entrada-titulo').value = '';
+            document.getElementById('entrada-texto').value = '';
+            renderizarEntradas();
+        }
+
+        function cerrarCuaderno() {
+            cuaderno.style.display = 'none';
+            candado.style.display = 'block';
+            document.getElementById('clave').value = '';
+            inicializarPantalla();
+        }
+
+        formAbrir.addEventListener('submit', function (e) {
+            e.preventDefault();
+            mensajeAbrir.classList.remove('mensaje-exito');
+            var clave = document.getElementById('clave').value;
+            if (clave === diario.password) {
+                abrirCuaderno();
+            } else {
+                mensajeAbrir.textContent = 'Contraseña incorrecta. La magia no se rinde fácil.';
+            }
+        });
+
+        formCrear.addEventListener('submit', function (e) {
+            e.preventDefault();
+            mensajeCrear.classList.remove('mensaje-exito');
+            var clave1 = document.getElementById('nueva-clave').value;
+            var clave2 = document.getElementById('nueva-clave2').value;
+            if (clave1.length < 4) {
+                mensajeCrear.textContent = 'La contraseña debe tener al menos 4 caracteres.';
+            } else if (clave1 !== clave2) {
+                mensajeCrear.textContent = 'Las contraseñas no coinciden.';
+            } else {
+                diario.password = clave1;
+                guardarDiario(diario);
+                abrirCuaderno();
+            }
+        });
+
+        document.getElementById('btn-cerrar').addEventListener('click', cerrarCuaderno);
+
+        document.getElementById('btn-guardar').addEventListener('click', function () {
+            var titulo = document.getElementById('entrada-titulo').value.trim();
+            var texto = document.getElementById('entrada-texto').value.trim();
+            if (!titulo && !texto) {
+                alert('Escribe algo antes de guardar tu entrada.');
+                return;
+            }
+            diario.entradas.push({
+                fecha: fechaHoy(),
+                titulo: titulo || 'Sin título',
+                texto: texto
+            });
+            guardarDiario(diario);
+            document.getElementById('entrada-titulo').value = '';
+            document.getElementById('entrada-texto').value = '';
+            renderizarEntradas();
+        });
+
+        function renderizarEntradas() {
+            var lista = document.getElementById('lista-entradas');
+            lista.innerHTML = '';
+            if (!diario.entradas.length) {
+                lista.innerHTML = '<p class="vacio">Aún no hay entradas. ¡Escribe tu primera aventura!</p>';
+                return;
+            }
+            diario.entradas.slice().reverse().forEach(function (entrada, indice) {
+                var real = diario.entradas.length - 1 - indice;
+                var item = document.createElement('div');
+                item.className = 'entrada-item';
+
+                var encabezado = document.createElement('div');
+                encabezado.className = 'encabezado';
+                var info = document.createElement('span');
+                info.textContent = '✦ ' + entrada.fecha + ' — ' + entrada.titulo;
+                var borrar = document.createElement('button');
+                borrar.className = 'borrar';
+                borrar.textContent = '✖';
+                borrar.title = 'Eliminar entrada';
+                encabezado.appendChild(info);
+                encabezado.appendChild(borrar);
+                item.appendChild(encabezado);
+
+                var prevista = document.createElement('div');
+                prevista.className = 'preview';
+                prevista.textContent = entrada.texto;
+                item.appendChild(prevista);
+
+                item.addEventListener('click', function () {
+                    document.getElementById('entrada-titulo').value = entrada.titulo;
+                    document.getElementById('entrada-texto').value = entrada.texto;
+                });
+                borrar.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    if (confirm('¿Seguro que quieres borrar esta entrada?')) {
+                        diario.entradas.splice(real, 1);
+                        guardarDiario(diario);
+                        renderizarEntradas();
+                    }
+                });
+
+                lista.appendChild(item);
+            });
+        }
+
+        inicializarPantalla();
+    </script>
+</body>
+</html>
