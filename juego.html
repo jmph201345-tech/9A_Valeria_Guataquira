@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geometry Dash 3D - 20 niveles</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  min-height:100vh;display:flex;justify-content:center;align-items:center;
+  font-family:Arial,sans-serif;color:#fff;overflow:hidden;
+  background:radial-gradient(circle at 50% 20%,#263b75 0,#0b1027 45%,#03040c 100%);
+}
+.contenedor{
+  width:min(96vw,1000px);padding:18px 22px;text-align:center;
+  background:rgba(5,9,24,.78);border:2px solid #72e7ff;border-radius:22px;
+  box-shadow:0 0 35px rgba(74,220,255,.22),inset 0 0 35px rgba(110,60,255,.08);
+  backdrop-filter:blur(8px);
+}
+.titulo{font-size:34px;letter-spacing:3px;margin-bottom:10px;text-shadow:0 0 16px #56dcff}
+.info{display:flex;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.info span{padding:7px 12px;border:1px solid #62dfff;border-radius:12px;background:rgba(20,40,80,.6);font-size:15px}
+#nivel{color:#7deaff} #vidas{color:#ffdf5d} #progreso{color:#a9ff91}
+canvas{
+  display:block;width:100%;height:auto;max-height:62vh;
+  border:2px solid #62dfff;border-radius:16px;background:#050714;
+  box-shadow:0 0 22px rgba(74,220,255,.35);cursor:pointer;
+}
+.mensaje{min-height:24px;margin:8px 0;color:#d9f8ff}
+button{
+  width:100%;padding:11px 16px;margin-top:8px;border:2px solid #62dfff;
+  border-radius:999px;background:rgba(30,70,110,.25);color:#fff;font-size:16px;
+  cursor:pointer;transition:.2s;
+}
+button:hover{background:#62dfff;color:#07101d;box-shadow:0 0 20px #62dfff}
+.nota{font-size:12px;color:#9db2c8;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="contenedor">
+  <h1 class="titulo">GEOMETRY DASH 3D</h1>
+  <div class="info">
+    <span>Nivel: <b id="nivel">1</b>/20</span>
+    <span>Vidas: <b id="vidas">3</b></span>
+    <span>Progreso: <b id="progreso">0%</b></span>
+  </div>
+  <canvas id="lienzo" width="900" height="500"></canvas>
+  <p class="mensaje" id="mensaje">ESPACIO / ↑ / clic para saltar</p>
+  <button id="btn-reiniciar">Reiniciar desde el nivel 1</button>
+  <button type="button" onclick="window.location.href='guitarhero.html'">🎸 Jugar Guitar Hero</button>
+  <button type="button" onclick="window.location.href='menu.html'">Volver al Menú</button>
+  <div class="nota">Versión 3D en perspectiva • 20 niveles • dificultad progresiva</div>
+</div>
+
+<script>
+const canvas=document.getElementById('lienzo');
+const ctx=canvas.getContext('2d');
+const W=canvas.width,H=canvas.height;
+const GROUND=H-92;
+let nivel=1,vidas=3,jugando=true,animacion;
+let distancia=0,frames=0,spawnTimer=0;
+const jugador={x:150,y:GROUND-42,size:42,vy:0,rot:0,onGround:true};
+const GRAV=0.92,JUMP=-16.5;
+
+const paletas=[
+ '#39e7ff','#7cff62','#ffe15c','#ff8a4c','#ff4f8b',
+ '#b36cff','#6aa7ff','#36f0b5','#ff5c5c','#f7a8ff'
+];
+
+const niveles=Array.from({length:20},(_,i)=>{
+  const d=1+i;
+  return {
+    velocidad:5.2+i*0.22,
+    distancia:1900+i*95,
+    gap:Math.max(38,72-i*1.5),
+    color:paletas[i%paletas.length],
+    dificultad:d
+  };
+});
+
+let obstaculos=[];
+let particulas=[];
+
+function configurarNivel(n){
+  const c=niveles[n-1];
+  distancia=0;frames=0;spawnTimer=25;obstaculos=[];
+  jugador.y=GROUND-jugador.size;jugador.vy=0;jugador.rot=0;jugador.onGround=true;
+  document.getElementById('nivel').textContent=n;
+  document.getElementById('vidas').textContent=vidas;
+  document.getElementById('progreso').textContent='0%';
+}
+
+function saltar(){
+  if(!jugando)return;
+  if(jugador.onGround){
+    jugador.vy=JUMP;jugador.onGround=false;
+    for(let i=0;i<5;i++)particulas.push({x:jugador.x+20,y:GROUND-4,vx:-Math.random()*2,vy:-Math.random()*2-1,life:20});
+  }
+}
+
+function generarObstaculo(){
+  const c=niveles[nivel-1];
+  const r=Math.random();
+  let tipo='spike',w=38,h=48;
+  if(r<.20 && nivel>=3){tipo='block';w=42;h=55;}
+  else if(r<.38 && nivel>=5){tipo='double';w=78;h=48;}
+  else if(r<.50 && nivel>=8){tipo='tall';w=44;h=82;}
+  obstaculos.push({x:W+35,z:1,tipo,w,h});
+}
+
+function spawn(){
+  const c=niveles[nivel-1];
+  const minGap=c.gap,maxGap=c.gap+35;
+  spawnTimer=minGap+Math.random()*(maxGap-minGap);
+  generarObstaculo();
+  if(nivel>=12 && Math.random()<.16){
+    obstaculos.push({x:W+35+55,z:1,tipo:'spike',w:38,h:48});
+  }
+}
+
+function colision(o){
+  const ox=o.x,oy=GROUND-o.h;
+  const px=jugador.x+7,py=jugador.y+7,pw=jugador.size-14,ph=jugador.size-12;
+  if(o.tipo==='spike'){
+    return px<ox+o.w-5 && px+pw>ox+5 && py+ph>oy+14;
+  }
+  return px<ox+o.w && px+pw>ox && py+ph>oy;
+}
+
+function perderVida(){
+  vidas--;
+  document.getElementById('vidas').textContent=vidas;
+  if(vidas<=0){
+    jugando=false;
+    document.getElementById('mensaje').textContent='GAME OVER • Pulsa Reiniciar para volver a empezar.';
+    return;
+  }
+  document.getElementById('mensaje').textContent='¡Cuidado! Has perdido una vida.';
+  configurarNivel(nivel);
+}
+
+function siguienteNivel(){
+  if(nivel>=20){
+    jugando=false;
+    document.getElementById('progreso').textContent='100%';
+    document.getElementById('mensaje').textContent='🏆 ¡INCREÍBLE! ¡Completaste los 20 niveles!';
+    return;
+  }
+  nivel++;
+  configurarNivel(nivel);
+  document.getElementById('mensaje').textContent='Nivel '+nivel+' • ¡Prepárate!';
+}
+
+function particulasActualizar(){
+  for(let i=particulas.length-1;i>=0;i--){
+    const p=particulas[i];p.x+=p.vx;p.y+=p.vy;p.vy+=.08;p.life--;
+    if(p.life<=0)particulas.splice(i,1);
+  }
+}
+
+function dibujarFondo(c){
+  const sky=ctx.createLinearGradient(0,0,0,H);
+  sky.addColorStop(0,'#07112d');sky.addColorStop(.55,'#101a42');sky.addColorStop(1,'#03050e');
+  ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+
+  // estrellas y sensación de profundidad
+  for(let i=0;i<55;i++){
+    const x=(i*173-(distancia*.12))%W;
+    const y=25+(i*67)%250;
+    const r=1+(i%3)*.45;
+    ctx.globalAlpha=.25+(i%4)*.12;ctx.fillStyle='#fff';
+    ctx.beginPath();ctx.arc((x+W)%W,y,r,0,Math.PI*2);ctx.fill();
+  }
+  ctx.globalAlpha=1;
+
+  // edificios/volúmenes del fondo
+  for(let i=0;i<12;i++){
+    const x=((i*100-distancia*.25)%1100+1100)%1100-100;
+    const h=45+(i%5)*18;
+    ctx.fillStyle='rgba(35,55,105,.42)';
+    ctx.fillRect(x,GROUND-h,75,h);
+    ctx.strokeStyle='rgba(100,180,255,.18)';
+    ctx.strokeRect(x,GROUND-h,75,h);
+  }
+
+  // suelo 3D: bandas que convergen hacia el horizonte
+  const horizon=GROUND-145;
+  ctx.fillStyle='#07101e';ctx.fillRect(0,GROUND,W,H-GROUND);
+  ctx.strokeStyle=c.color;ctx.lineWidth=2;ctx.shadowColor=c.color;ctx.shadowBlur=8;
+  ctx.beginPath();ctx.moveTo(0,GROUND);ctx.lineTo(W,GROUND);ctx.stroke();ctx.shadowBlur=0;
+
+  for(let i=0;i<=10;i++){
+    const t=i/10;
+    const y=horizon+Math.pow(t,1.7)*(H-horizon);
+    ctx.strokeStyle='rgba(110,210,255,.17)';
+    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+  }
+  for(let i=-8;i<=8;i++){
+    const bx=W/2+i*72;
+    ctx.strokeStyle='rgba(110,210,255,.14)';
+    ctx.beginPath();ctx.moveTo(W/2+(bx-W/2)*.12,horizon);ctx.lineTo(bx,H);ctx.stroke();
+  }
+
+  // plataformas laterales
+  ctx.fillStyle='rgba(30,80,120,.35)';
+  ctx.fillRect(0,GROUND+28,W,20);
+}
+
+function cubo3D(x,y,s,color,rotation=0){
+  ctx.save();ctx.translate(x+s/2,y+s/2);ctx.rotate(rotation);
+  const a=s*.22;
+  ctx.shadowColor=color;ctx.shadowBlur=16;
+
+  ctx.fillStyle=color;ctx.fillRect(-s/2,-s/2,s,s);
+  ctx.fillStyle='rgba(255,255,255,.23)';
+  ctx.beginPath();ctx.moveTo(-s/2,-s/2);ctx.lineTo(-s/2+a,-s/2-a);
+  ctx.lineTo(s/2+a,-s/2-a);ctx.lineTo(s/2,-s/2);ctx.closePath();ctx.fill();
+  ctx.fillStyle='rgba(0,0,0,.24)';
+  ctx.beginPath();ctx.moveTo(s/2,-s/2);ctx.lineTo(s/2+a,-s/2-a);
+  ctx.lineTo(s/2+a,s/2-a);ctx.lineTo(s/2,s/2);ctx.closePath();ctx.fill();
+
+  ctx.fillStyle='#07101d';
+  ctx.fillRect(-s*.22,-s*.18,s*.14,s*.14);
+  ctx.fillRect(s*.08,-s*.18,s*.14,s*.14);
+  ctx.strokeStyle='#fff';ctx.lineWidth=3;
+  ctx.strokeRect(-s*.28,-s*.29,s*.56,s*.48);
+  ctx.restore();
+}
+
+function dibujarObstaculo(o,c){
+  const depth=Math.max(.35,1-(o.x-W*.35)/W*.22);
+  const y=GROUND-o.h*depth;
+  const h=o.h*depth,w=o.w*depth;
+  ctx.save();ctx.shadowColor=c.color;ctx.shadowBlur=12;
+  if(o.tipo==='spike'){
+    ctx.fillStyle=c.color;ctx.beginPath();
+    ctx.moveTo(o.x,GROUND);ctx.lineTo(o.x+w/2,y);ctx.lineTo(o.x+w,GROUND);ctx.closePath();ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.28)';ctx.beginPath();
+    ctx.moveTo(o.x+w/2,y);ctx.lineTo(o.x+w*.66,GROUND);ctx.lineTo(o.x+w/2,GROUND-5);ctx.closePath();ctx.fill();
+  }else if(o.tipo==='double'){
+    for(let k=0;k<2;k++){
+      const xx=o.x+k*(w/2);
+      ctx.fillStyle=c.color;ctx.beginPath();
+      ctx.moveTo(xx,GROUND);ctx.lineTo(xx+w/4,y);ctx.lineTo(xx+w/2,GROUND);ctx.closePath();ctx.fill();
+    }
+  }else{
+    ctx.fillStyle=c.color;ctx.fillRect(o.x,y,w,h);
+    ctx.fillStyle='rgba(255,255,255,.22)';
+    ctx.beginPath();ctx.moveTo(o.x,y);ctx.lineTo(o.x+8,y-8);ctx.lineTo(o.x+w+8,y-8);ctx.lineTo(o.x+w,y);ctx.closePath();ctx.fill();
+    ctx.fillStyle='rgba(0,0,0,.2)';ctx.fillRect(o.x+w-7,y+7,7,h);
+  }
+  ctx.restore();
+}
+
+function dibujar(){
+  const c=niveles[nivel-1];
+  dibujarFondo(c);
+  for(const o of obstaculos)dibujarObstaculo(o,c);
+  for(const p of particulas){
+    ctx.globalAlpha=Math.max(0,p.life/20);ctx.fillStyle=c.color;
+    ctx.fillRect(p.x,p.y,4,4);
+  }
+  ctx.globalAlpha=1;
+  cubo3D(jugador.x,jugador.y,jugador.size,c.color,jugador.rot);
+  ctx.fillStyle='#fff';ctx.font='bold 15px Arial';ctx.fillText('3D',jugador.x+10,jugador.y+34);
+
+  // barra de avance
+  ctx.fillStyle='rgba(255,255,255,.12)';ctx.fillRect(20,18,W-40,6);
+  ctx.fillStyle=c.color;ctx.fillRect(20,18,(W-40)*Math.min(1,distancia/c.distancia),6);
+}
+
+function actualizar(){
+  const c=niveles[nivel-1];
+  if(jugando){
+    if(!jugador.onGround){
+      jugador.vy+=GRAV;jugador.y+=jugador.vy;jugador.rot+=.16;
+      if(jugador.y>=GROUND-jugador.size){
+        jugador.y=GROUND-jugador.size;jugador.vy=0;jugador.onGround=true;
+        jugador.rot=Math.round(jugador.rot/(Math.PI/2))*(Math.PI/2);
+      }
+    }
+    distancia+=c.velocidad;frames++;spawnTimer--;
+    if(spawnTimer<=0)spawn();
+    for(let i=obstaculos.length-1;i>=0;i--){
+      const o=obstaculos[i];o.x-=c.velocidad;
+      if(o.x+o.w<0){obstaculos.splice(i,1);continue}
+      if(colision(o)){perderVida();break}
+    }
+    const pct=Math.min(100,Math.floor(distancia/c.distancia*100));
+    document.getElementById('progreso').textContent=pct+'%';
+    if(distancia>=c.distancia)siguienteNivel();
+    particulasActualizar();
+  }
+  dibujar();
+  animacion=requestAnimationFrame(actualizar);
+}
+
+canvas.addEventListener('click',saltar);
+window.addEventListener('keydown',e=>{
+  if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();saltar();}
+});
+document.getElementById('btn-reiniciar').addEventListener('click',()=>{
+  nivel=1;vidas=3;jugando=true;
+  document.getElementById('mensaje').textContent='ESPACIO / ↑ / clic para saltar';
+  configurarNivel(1);
+});
+
+configurarNivel(1);
+actualizar();
+</script>
+</body>
+</html>
