@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tareas - Reino Mágico</title>
+<link rel="stylesheet" href="estilos.css">
+<style>
+    .hoja {
+        position: relative;
+        z-index: 1;
+        width: 94%;
+        max-width: 560px;
+        background: #fdf6e3;
+        color: #3a2f1e;
+        border-radius: 8px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, .5), 0 0 40px rgba(240, 199, 94, .12);
+        padding: 28px 30px 26px 40px;
+        font-family: 'Caveat', cursive;
+    }
+
+    .hoja::before {
+        content: '';
+        position: absolute;
+        left: 26px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: rgba(224, 108, 95, .6);
+    }
+
+    .hoja-titulo {
+        font-family: 'Cinzel', serif;
+        color: #5a4632;
+        font-size: 26px;
+        text-align: center;
+        letter-spacing: 2px;
+        border-bottom: 2px solid #5a4632;
+        padding-bottom: 8px;
+        margin-bottom: 6px;
+    }
+
+    .hoja-subtitulo {
+        text-align: center;
+        font-size: 21px;
+        color: #7a6a52;
+    }
+
+    .agregar {
+        display: flex;
+        gap: 10px;
+        margin-top: 16px;
+    }
+
+    .entrada-tarea {
+        flex: 1;
+        font-family: 'Caveat', cursive;
+        font-size: 24px;
+        padding: 8px 14px;
+        border: none;
+        border-bottom: 2px dashed rgba(90, 70, 50, .4);
+        background: transparent;
+        color: #3a2f1e;
+        border-radius: 0;
+    }
+
+    .entrada-tarea:focus {
+        box-shadow: none;
+        border-color: #a8894a;
+    }
+
+    .boton-agregar {
+        font-size: 26px;
+        line-height: 1;
+        padding: 4px 18px;
+        border: 2px solid #5a4632;
+        border-radius: 10px;
+        background: transparent;
+        color: #5a4632;
+        cursor: pointer;
+        transition: all .3s;
+    }
+
+    .boton-agregar:hover {
+        background: #5a4632;
+        color: #fdf6e3;
+    }
+
+    .lista {
+        margin-top: 14px;
+        list-style: none;
+        background-image: repeating-linear-gradient(to bottom, transparent 0 35px, rgba(90, 80, 50, .30) 35px 36px);
+        min-height: 35px;
+    }
+
+    .tarea {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 35px;
+        font-size: 24px;
+    }
+
+    .tarea input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        padding: 0;
+        border: none;
+        background: transparent;
+        accent-color: #5a4632;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .tarea span {
+        flex: 1;
+        word-break: break-word;
+    }
+
+    .tarea.hecha span {
+        text-decoration: line-through;
+        color: #8a7a60;
+    }
+
+    .borrar {
+        background: none;
+        border: none;
+        color: #c0392b;
+        font-size: 16px;
+        cursor: pointer;
+        padding: 2px 8px;
+    }
+
+    .borrar:hover {
+        color: #922b21;
+    }
+
+    .vacio {
+        text-align: center;
+        color: #8a7a60;
+        font-size: 21px;
+        font-style: italic;
+        padding: 10px 0;
+    }
+
+    .acciones {
+        display: flex;
+        gap: 10px;
+        margin-top: 18px;
+        flex-wrap: wrap;
+    }
+
+    .boton-hoja {
+        flex: 1;
+        min-width: 160px;
+        padding: 10px 14px;
+        font-family: 'Cinzel', serif;
+        font-size: 14px;
+        letter-spacing: 1px;
+        color: #5a4632;
+        border: 2px solid #5a4632;
+        border-radius: 10px;
+        background: transparent;
+        cursor: pointer;
+        transition: all .3s;
+    }
+
+    .boton-hoja:hover {
+        background: #5a4632;
+        color: #fdf6e3;
+    }
+</style>
+</head>
+<body>
+    <div class="luna"></div>
+    <div class="estrellas" id="estrellas"></div>
+
+    <div class="hoja">
+        <h2 class="hoja-titulo">🧾 Misiones de Clase</h2>
+        <p class="hoja-subtitulo" id="contador">0 pendientes</p>
+
+        <div class="agregar">
+            <input type="text" id="nueva-tarea" class="entrada-tarea" placeholder="Escribe una tarea..." autocomplete="off">
+            <button type="button" class="boton-agregar" id="btn-agregar">＋</button>
+        </div>
+
+        <ul class="lista" id="lista-tareas"></ul>
+
+        <div class="acciones">
+            <button type="button" class="boton-hoja" id="btn-limpiar">Eliminar completadas</button>
+            <button type="button" class="boton-hoja" onclick="window.location.href='menu.html'">Volver al menú</button>
+        </div>
+    </div>
+
+    <script src="magia.js"></script>
+    <script>
+        verificarSesion();
+
+        var clave = 'tareas_' + usuarioActual();
+
+        function leerTareas() {
+            try {
+                var datos = JSON.parse(localStorage.getItem(clave) || '[]');
+                return Array.isArray(datos) ? datos : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function guardarTareas(tareas) {
+            try {
+                localStorage.setItem(clave, JSON.stringify(tareas));
+            } catch (e) {}
+        }
+
+        var tareas = leerTareas();
+
+        function renderizar() {
+            var lista = document.getElementById('lista-tareas');
+            lista.innerHTML = '';
+
+            if (!tareas.length) {
+                lista.innerHTML = '<li class="vacio">No hay tareas. ¡Agrega la primera!</li>';
+            }
+
+            var pendientes = 0;
+            tareas.forEach(function (tarea, indice) {
+                if (!tarea.hecho) pendientes++;
+
+                var li = document.createElement('li');
+                li.className = 'tarea' + (tarea.hecho ? ' hecha' : '');
+
+                var chk = document.createElement('input');
+                chk.type = 'checkbox';
+                chk.checked = tarea.hecho;
+                chk.addEventListener('change', function () {
+                    tareas[indice].hecho = chk.checked;
+                    guardarTareas(tareas);
+                    renderizar();
+                });
+
+                var span = document.createElement('span');
+                span.textContent = tarea.texto;
+
+                var borrar = document.createElement('button');
+                borrar.className = 'borrar';
+                borrar.textContent = '✖';
+                borrar.title = 'Eliminar tarea';
+                borrar.addEventListener('click', function () {
+                    tareas.splice(indice, 1);
+                    guardarTareas(tareas);
+                    renderizar();
+                });
+
+                li.appendChild(chk);
+                li.appendChild(span);
+                li.appendChild(borrar);
+                lista.appendChild(li);
+            });
+
+            document.getElementById('contador').textContent = pendientes + (pendientes === 1 ? ' pendiente' : ' pendientes');
+        }
+
+        function agregar() {
+            var input = document.getElementById('nueva-tarea');
+            var texto = input.value.trim();
+            if (!texto) return;
+            tareas.push({ texto: texto, hecho: false });
+            input.value = '';
+            guardarTareas(tareas);
+            renderizar();
+        }
+
+        document.getElementById('btn-agregar').addEventListener('click', agregar);
+
+        document.getElementById('nueva-tarea').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') agregar();
+        });
+
+        document.getElementById('btn-limpiar').addEventListener('click', function () {
+            tareas = tareas.filter(function (tarea) {
+                return !tarea.hecho;
+            });
+            guardarTareas(tareas);
+            renderizar();
+        });
+
+        renderizar();
+    </script>
+</body>
+</html>
